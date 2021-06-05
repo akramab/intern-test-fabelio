@@ -1,5 +1,7 @@
 import React from 'react'
 import styled from 'styled-components'
+import ReactTooltip from 'react-tooltip'
+
 
 
 const Product = ({product}) => {
@@ -37,8 +39,12 @@ const Product = ({product}) => {
                     <h2>Colours: </h2>
                     <ColourContainer>
                         {/* tambahin property warna */}
-                        {product.csscolours.map((colour) => (
-                            <Colour style={{background : colour}}></Colour>
+                        {product.csscolours.map((colour, index) => (
+                        <>
+                            <span data-tip data-for={colour} style={{...colourStyle, backgroundColor: colour}}></span>
+                            <ReactTooltip id={colour} backgroundColor={colour}>{product.colours[index]}</ReactTooltip>
+                            {/* <Colour style={{background : colour}}></Colour> */}
+                        </>
                         ))}
                     </ColourContainer>
                 </ProductColours>
@@ -175,4 +181,25 @@ const Colour = styled.span`
         transform: scale(.8);
     }
 `
+const colourStyle = {
+    width:'20px',
+    height:'20px',
+    display:'inline-block',
+    transition:'0.3s all',
+    borderRadius:'50%',
+    background: '#ef8bef',
+    transition: 'all .3s',
+    margin: '0 15px',
+
+    // :hover{
+    //     transform: 'scale(1.2)',
+    //     boxShadow: '0 0 0 8px rgba(173, 173, 170, .3)',
+    //     cursor: 'pointer',
+    // }
+
+    // :active{
+    //     transform: 'scale(.8)'
+    // }
+}
+
 const RefreshButton = styled(AddToChart)``

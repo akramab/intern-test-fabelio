@@ -23,4 +23,4 @@ The current product ID that's currently being viewed by the user is stored in a 
 - Firestore Database
 
 ## Author:
-- Muhammad Akram Al Bari (13519142)
+- Muhammad Akram Al Bari (Institut Teknologi Bandung)
