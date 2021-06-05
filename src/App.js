@@ -1,23 +1,26 @@
-import './App.css';
-import Header from './components/Header';
-import Product from './components/Product'
+import Product from './components/Product';
+import Loading from './components/Loading';
 import firebase from './firebase';
-import React, { useState, useEffect, useMemo} from "react";
-import { RestoreFromTrash } from '@material-ui/icons';
+import React, { useState, useEffect} from "react";
 
 
 function App() {
+  //initialize constants and variables
   const SET_USER = "user1";
   const NUM_OF_PRODUCTS = 10;
-  const OUT_OF_STOCK = 1;
+  const OUT_OF_STOCK_NAME = "Sofa 2 dudukan Vienna"
+  let OUT_OF_STOCK = 1;
 
+  //react state to manage data
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [user, setUser] = useState([]);
 
+  //initialize firebase reference to each collection
   const refProducts = firebase.firestore().collection("products");
   const refUsers = firebase.firestore().collection("users");
 
+  //count each product volume; return as array of number
   function countVolume(products) {
     const productsDimension = []
     products.forEach(product => {
@@ -29,9 +32,9 @@ function App() {
     return productsVolume;
   }
 
+  //ascending selection sort with 2 params; targetArr will be sorted with refArr as its sort parameter
   function twoArraySort(targetArr, refArr) {
     for (let i=0; i <= refArr.length-1; i++) {
-      // find the idnex of the smallest element
       let smallestIdx = i
   
       for (let j=i; j <= refArr.length-1; j++) {
@@ -40,7 +43,7 @@ function App() {
         }
       }
   
-      // if current iteration element isn't smallest swap it
+
       if (refArr[i] > refArr[smallestIdx]) {
         let temp1 = refArr[i]
         let temp2 = targetArr[i]
@@ -54,13 +57,16 @@ function App() {
     return targetArr
   }
 
+  //sort products by its volume with reference a specific target volume as its reference
   function sortByVolume(products, productsVolume, targetVolume) {
     const distances = productsVolume.map(volume => Math.abs(volume-targetVolume))
     const filteredProducts = products.filter((product, index) => index != OUT_OF_STOCK);
     const filteredDistance = distances.filter((distance, index) => index != OUT_OF_STOCK);
+    
     return twoArraySort(filteredProducts,filteredDistance)
   }
 
+  //set product state with value from firestore database
   function getProducts() {
     setLoading(true);
     refProducts.onSnapshot((querySnapshot) => {
@@ -73,26 +79,7 @@ function App() {
     })
   }
 
-  // function getProducts() {
-  //   setLoading(true);
-  //   refProducts.get().then((item) => {
-  //     const items = item.docs.map((doc) => doc.data());
-  //     setProducts(items);
-  //     setLoading(false);
-  //   })
-  // }
-
-  // function getUser() {
-  //   refUsers.onSnapshot((querySnapshot) => {
-  //     const users = [];
-  //     querySnapshot.forEach((doc) => {
-  //       users.push(doc.data())
-  //     });
-  //     const cUser = users.find(user => user.id == SET_USER)
-  //     setUser(cUser);
-  //   })
-  // }
-
+  //set users state with value from firestore database
   function getUser() {
     refUsers.get().then((item) => {
       const users = item.docs.map((doc) => doc.data());
@@ -101,25 +88,32 @@ function App() {
     })
   }
 
+  //update current product data in database after each render
   function updateCurrentProduct(cUser) {
-    console.log("Nilai saat ini " + cUser.currentproduct)
-    let nextproduct = (cUser.currentproduct !== NUM_OF_PRODUCTS) ? cUser.currentproduct + 1 : 1
-    console.log("Nilai next " + nextproduct)
-    if (nextproduct === OUT_OF_STOCK) {
-      nextproduct = (nextproduct !== NUM_OF_PRODUCTS) ? nextproduct + 1 : 1
-      console.log("Nilai kalau masuk if "+nextproduct)
+    // let nextproduct = (cUser.currentproduct !== NUM_OF_PRODUCTS-2) ? cUser.currentproduct + 1 : 0
+
+    let nextproduct = cUser.currentproduct;
+
+    if (nextproduct === NUM_OF_PRODUCTS-2) {
+      alert("You've viewed all the available products! When you refresh the page, you'll see the products from the start of the list!");
+      nextproduct = 0;
+    } else {
+      nextproduct++;
     }
+    
     refUsers.doc(cUser.id).update({
       currentproduct: nextproduct
     })
     .catch(err => console.log(err))
   }
 
+  //call getProducts and getUser once in each render
   useEffect(() => {
     getProducts();
     getUser();
   },[])
 
+  //call updateCurrentProduct whenever user state get changed
   useEffect(() => {
     updateCurrentProduct(user);
   },[user])
@@ -127,19 +121,25 @@ function App() {
 
   if (products.length != 0 && user.currentproduct != undefined) {
     const productVolume = countVolume(products);
-    console.log("Yang udah urut")
-    console.log("Produk yang OUT OF STOCK: "+products[OUT_OF_STOCK].name)
-    console.log(sortByVolume(products, productVolume, productVolume[OUT_OF_STOCK]))
+    let targetProduct;
+    products.forEach((product, index) => {
+      if (product.name === OUT_OF_STOCK_NAME) {
+        targetProduct = index;
+      }
+    });
+    OUT_OF_STOCK = targetProduct;
+    const filteredProducts = sortByVolume(products, productVolume, productVolume[OUT_OF_STOCK])
 
     return (
       <div className="App">
       {/* <Header /> */}
-      <Product product={products.find(product => product.id == user.currentproduct)} />
+      <Product product={filteredProducts[user.currentproduct]} />
     </div>
     );
   }
 
-  return (<div>Loading....</div>
+  return (
+    <Loading />
   );
 }
 

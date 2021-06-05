@@ -3,6 +3,10 @@ import styled from 'styled-components'
 
 
 const Product = ({product}) => {
+    function refreshPage(){ 
+        window.location.reload(); 
+    }
+
     return (
         <Container>
             <ProductContainer>
@@ -33,15 +37,16 @@ const Product = ({product}) => {
                     <h2>Colours: </h2>
                     <ColourContainer>
                         {/* tambahin property warna */}
-                        {product.colours.map((colour) => (
-                            <Colour></Colour>
+                        {product.csscolours.map((colour) => (
+                            <Colour style={{background : colour}}></Colour>
                         ))}
                     </ColourContainer>
                 </ProductColours>
                 <ProductMaterial>
 
                 </ProductMaterial>
-                <AddToChart> Add To Chart</AddToChart>
+                {/* <AddToChart> Add To Chart</AddToChart> */}
+                <RefreshButton onClick={ refreshPage }> Refresh Item</RefreshButton>
             </ProductDetails>
             </ProductContainer>
         </Container>
@@ -170,3 +175,4 @@ const Colour = styled.span`
         transform: scale(.8);
     }
 `
+const RefreshButton = styled(AddToChart)``
