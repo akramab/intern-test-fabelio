@@ -14,7 +14,9 @@ With the given data, the attribute(s) of each product that we have are: Product 
 
 From some sources, for example: https://www.thespruce.com/considerations-before-buying-sofa-1391489, we could infer that Size is one of the deciding factors when it comes to buying a Sofa. So the algorithm will first look for the product that has the most similiar size (in this case, Dimension (Volume)) from the reference product, and it will sort the product list starting from the product that has the smallest Δ in terms of dimension from the reference product .
 
-Sometimes we also need to account for price too. So, the algorithm will next try to look for products that have the same Δ in dimension, and it will try to sort it again from the one that has the smallest Δ in price from the reference product.
+Sometimes we also need to account for price too. So, the algorithm will next try to look for products that have the same Δ in dimension, and it will try to sort it again from the one that has the smallest Δ in price from the reference product. For this case, we will first need to decide on some threshold value, for example 10%, so that we will compare every Δ in dimension that is less than 10% will be sorted again by its Δ price.
+
+We could actually go further and account for Material attribute too. But, because the given dataset is not diverse enough, and I personally think there's not enough Material details to discern and group one material to another, I am not using Material attribute as a parameter to test for similarity between products.
 
 The current product ID that's currently being viewed by the user is stored in a database. And it will constantly update itself whenever the page is rendered, so that every product will be viewed in succession, according to the list that has been sorted by the algorithm.
 
