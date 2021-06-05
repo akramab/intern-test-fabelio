@@ -22,5 +22,8 @@ The current product ID that's currently being viewed by the user is stored in a 
 - React
 - Firestore Database
 
+## Deployed on
+https://silly-sammet-9faab6.netlify.app/
+
 ## Author:
 - Muhammad Akram Al Bari (Institut Teknologi Bandung)
